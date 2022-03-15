@@ -1,5 +1,6 @@
 # DeeGateway
-基于Bumblebee的一个网关管理系统
+基于Bumblebee的一个网关管理系统。
+已经用于生产环境连续运行18个月。
 
 ## 功能
  - 使用Layui作为后台管理UI
