@@ -1,0 +1,244 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>控制台 - DeeGateway</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="../../__system/layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../../__system/layuiadmin/style/admin.css" media="all">
+</head>
+
+<body>
+
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md8">
+        <div class="layui-row layui-col-space15">
+
+          <div class="layui-col-md12">
+            <div class="layui-card">
+              <div class="layui-card-header">系统信息</div>
+              <div class="layui-card-body">
+
+                <div class="layadmin-backlog">
+                  <!-- <div carousel-item> -->
+                  <ul class="layui-row layui-col-space10">
+                    <li class="layui-col-xs3">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>运行时间 (日:时:分:秒)</h3>
+                        <p><cite id="RunTime">00:00:00:59</cite></p>
+                      </a>
+                    </li>
+                    <li class="layui-col-xs2">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>CPU (%)</h3>
+                        <p><cite id="Cpu">0</cite></p>
+                      </a>
+                    </li>
+                    <li class="layui-col-xs3">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>内存 (KB)</h3>
+                        <p><cite id="Memory">0</cite></p>
+                      </a>
+                    </li>
+                    <li class="layui-col-xs2">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>当前队列</h3>
+                        <p><cite id="Queue">0</cite></p>
+                      </a>
+                    </li>
+                    <li class="layui-col-xs2">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>请求失败数</h3>
+                        <p><cite id="ErrorRps">0</cite></p>
+                      </a>
+                    </li>
+                  </ul>
+
+                  <ul class="layui-row layui-col-space10">
+                    <li class="layui-col-xs3">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>总请求数</h3>
+                        <p><cite id="TotalRequest">0</cite></p>
+                      </a>
+                    </li>
+                    <li class="layui-col-xs2">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>当前请求数</h3>
+                        <p><cite id="RequestPer">0</cite></p>
+                      </a>
+                    </li>
+                    <li class="layui-col-xs3">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>总连接数</h3>
+                        <p><cite id="TotalConnections">0</cite></p>
+                      </a>
+                    </li>
+                    <li class="layui-col-xs2">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>当前连接数</h3>
+                        <p><cite id="ConnectionsPer">0</cite></p>
+                      </a>
+                    </li>
+                    <li class="layui-col-xs2">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>活动连接数</h3>
+                        <p><cite id="CurrentConnectinos">0</cite></p>
+                      </a>
+                    </li>
+
+
+
+
+                    <li class="layui-col-xs3">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>总接收数据 (MB)</h3>
+                        <p><cite id="TotalReceiveBytes">0</cite></p>
+                      </a>
+                    </li>
+                    <li class="layui-col-xs3">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>当前接收数据 (MB)</h3>
+                        <p><cite id="ReceiveBytesPer">0</cite></p>
+                      </a>
+                    </li>
+                    <li class="layui-col-xs3">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>总发送数据 (MB)</h3>
+                        <p><cite id="TotalSendBytes">0</cite></p>
+                      </a>
+                    </li>
+                    <li class="layui-col-xs3">
+                      <a href="javascript:;" class="layadmin-backlog-body">
+                        <h3>当前发送数据 (MB)</h3>
+                        <p><cite id="SendBytesPer">0</cite></p>
+                      </a>
+                    </li>
+
+                  </ul>
+
+                  <!-- </div> -->
+                </div>
+              </div>
+            </div>
+          </div>
+      
+        </div>
+      </div>
+
+      <div class="layui-col-md4">
+
+        <div class="layui-card">
+          <div class="layui-card-header">版本信息</div>
+          <div class="layui-card-body layui-text">
+            <table class="layui-table">
+              <colgroup>
+                <col width="100">
+                <col>
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td>ServerName</td>
+                  <td>
+                    <cite id="ServerName"></cite>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Host</td>
+                  <td>
+                    <cite id="Host"></cite>
+                  </td>
+                </tr>
+                <tr>
+                  <td>当前版本</td>
+                  <td>
+                    <cite id="GatewayVersion">1.0.0</cite>
+                  </td>
+                </tr>
+                <tr>
+                  <td>基于框架</td>
+                  <td>
+                    BeetleX: <cite id="BeetleXVersion"></cite> <br />BeetleX.FastHtttpApi: <cite
+                      id="WebApiVersion">1.0</cite>
+                  </td>
+                </tr>
+                <tr>
+                  <td>启动时间</td>
+                  <td>
+                    <cite id="StartDateTime">1.0.0</cite>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+        <div class="layui-card">
+          <div class="layui-card-header">
+            系统简介
+            <i class="layui-icon layui-icon-tips" lay-tips="要支持的噢" lay-offset="5"></i>
+          </div>
+          <div class="layui-card-body layui-text layadmin-text">
+            <p>本系统基于 Bumblebee 开发。</p>
+            <p>插件系统参考于基于 openresty 的 Orange 网关进行开发。</p>
+            <!--<p> -- eddy@an1ai.com</p>-->
+            <!--<p>© 2019-2020 <a href="http://www.an1ai.com/" target="_blank">an1ai.com</a></p>-->
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+    <script src="../../__system/layuiadmin/layui/layui.js?t=1"></script>
+    <script>
+      layui.config({
+        base: '../../__system/layuiadmin/' //静态资源所在路径
+      }).extend({
+        index: 'lib/index' //主入口模块
+      }).use(['index'], function () {
+        var $ = layui.$;
+        var ApiUrl = layui.sessionData('ApiUrl');
+
+        $.get({
+          url: ApiUrl.BaseUrl + 'system/Status',
+          headers: {
+            "Authorization": layui.sessionData('DeeGateway').AccessToken
+          },
+          dataType: 'JSON',
+          success: function (ret) {
+            $("#ServerName").html(ret.Status.ServerName);
+            $("#BeetleXVersion").html(ret.Status.BeetleXVersion);
+            $("#WebApiVersion").html(ret.Status.WebApiVersion);
+            $("#RunTime").html(ret.Status.RunTime);
+            $("#Host").html(ret.Status.Host + ':' + ret.Status.Port);
+
+            $("#Cpu").html(ret.Status.Cpu);
+            $("#Memory").html(ret.Status.Memory);
+            $("#TotalConnections").html(ret.Status.TotalConnections);
+            $("#ConnectionsPer").html(ret.Status.ConnectionsPer);
+            $("#CurrentConnectinos").html(ret.Status.CurrentConnectinos);
+            $("#RequestPer").html(ret.Status.RequestPer);
+
+            $("#TotalRequest").html(ret.Status.TotalRequest);
+            $("#ReceiveBytesPer").html(ret.Status.ReceiveBytesPer);
+            $("#TotalReceiveBytes").html(ret.Status.TotalReceiveBytes);
+            $("#SendBytesPer").html(ret.Status.SendBytesPer);
+            $("#TotalSendBytes").html(ret.Status.TotalSendBytes);
+            $("#StartDateTime").html(ret.StartTime);
+            $("#Queue").html(ret.Queue);
+            $("#ErrorRps").html(ret.ErrorRps); 
+          }
+        });
+      });
+     
+    </script>
+</body>
+
+</html>

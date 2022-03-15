@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../../__system/layuiadmin/layui/css/layui.css" media="all">
+    <style>
+        /* 防止下拉框的下拉列表被隐藏---必须设置--- */
+        .layui-table-cell {
+            font-size: 14px;
+            padding: 0 5px;
+            height: auto;
+            overflow: visible;
+            text-overflow: inherit;
+            white-space: normal;
+            word-break: break-all;
+
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+
+            <div class="layui-card">
+                <div class="layui-card-header">Rewrite 详情编辑</div>
+                <div class="layui-card-body">
+                    <form class="layui-form" lay-filter="component-form-element" id="component-form-element">
+                        <div class="layui-form-item  layui-hide">
+                            <label class="layui-form-label">ID：</label>
+                            <div class="layui-col-md3">
+                                <input type="number" name="id" id="id" lay-verify="" placeholder="" autocomplete="off"
+                                    class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">用途：</label>
+                            <div class="layui-col-md3">
+                                <input type="text" name="title" id="title" lay-verify="" placeholder=""
+                                    autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item layui-col-md3">
+                            <label class="layui-form-label">路由：</label>
+                            <div class="layui-input-block">
+                                <select name="urlroute_id" id="urlroute_id" lay-verify="required">
+                                    <option value="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item layui-col-md3">
+                            <label class="layui-form-label">匹配类型：</label>
+                            <div class="layui-input-block">
+                                <select name="condition_type" id="condition_type" lay-verify="required"
+                                    lay-filter="aihao">
+                                    <option value=""></option>
+                                    <option value="1">任意一个</option>
+                                    <option value="2">全部匹配</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item " style="margin-bottom: 0px">
+                            <label class="layui-form-label">匹配条件：</label>
+                            <div class="layui-btn-group">
+                                <a class="layui-btn layui-btn-sm " id="add_condition"><i class="layui-icon"></i></a>
+                            </div>
+                        </div>
+                        <div class="layui-form-item ">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-col-md9 ">
+                                <table id="condition_list" lay-filter="condition_list"></table>
+                            </div>
+                        </div>
+                        <div class="layui-form-item " style="margin-bottom: 0px">
+                            <label class="layui-form-label">变量获取：</label>
+                            <div class="layui-btn-group">
+                                <a class="layui-btn layui-btn-sm " id="add_extractor"><i class="layui-icon"></i></a>
+                            </div>
+                        </div>
+                        <div class="layui-form-item ">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-col-md9 ">
+                                <table id="extractor_list" lay-filter="extractor_list"></table>
+                            </div>
+                        </div>
+                        <div class="layui-card-header">Rewrite 信息</div><br />
+
+                        <div class="layui-form-item ">
+                            <label class="layui-form-label">Url</label>
+                            <div class="layui-col-md3">
+                                <input type="text" name="url" id="url" lay-verify="required" placeholder=""
+                                    autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">是否启用：</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="enable" id="enable" lay-skin="switch" lay-text="启用|禁用">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit lay-filter="component-form-submit"
+                                    id="btnsubmit">立即提交</button>
+                                <button class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="component-form-reset">重置</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/html" id="table-content-list">
+<div class="layui-btn-group">
+                <a class="layui-btn layui-btn-sm" lay-event="del"><i class="layui-icon"></i></a>
+              </div>
+   </script>
+    <script src="../../../__system/layuiadmin/layui/layui.js"></script>
+    <script>
+        layui.config({
+            base: '../../../__system/layuiadmin/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use(['index', 'utils', 'html', 'table', 'notice'], function () {
+            var $ = layui.$
+                , table = layui.table
+                , utils = layui.utils
+                , html = layui.html
+                , notice = layui.notice
+                , form = layui.form;
+            var ApiUrl = layui.sessionData('ApiUrl');
+            var topLayui = parent === self ? layui : top.layui;
+
+            var ID = utils.GetQueryString("id");
+            var condition_data = [{}];
+            var extractor_data = [{}];
+            var handle_data = [{}];
+
+
+
+
+            $.ajax({
+                type: "GET"
+                , url: ApiUrl.BaseUrl + 'gateway/ListAllUrlRoute?sortField=urlroute_name&orderType=asc'
+                , headers: {
+                    "Authorization": layui.sessionData('DeeGateway').AccessToken
+                }
+                , contentType: "application/json;charset=UTF-8",
+                success: function (resp) {
+
+                    $.each(resp.data, function (index, item) {
+                        $('#urlroute_id').append(new Option(item.urlroute_name, item.id));//往下拉菜单里添加元素
+                    });
+                    // 关键
+                    form.render();
+                    initData();
+                }
+
+            });
+            var initData = function () {
+                $.ajax({
+                    type: "POST"
+                    , url: ApiUrl.BaseUrl + 'plugin/rewrite/RewriteInfo?id=' + ID
+                    , headers: {
+                        "Authorization": layui.sessionData('DeeGateway').AccessToken
+                    }
+                    , dataType: "JSON",
+                    success: function (resp) {
+                        condition_data = resp.data.condition_value;
+                        extractor_data = resp.data.extractor;
+                        handle_data = resp.data.handle;
+
+                        form.val('component-form-element', {
+                            "id": resp.data.id,
+                            "title": resp.data.title,
+                            "urlroute_id": resp.data.urlroute_id,
+                            "condition_type": resp.data.condition_type,
+                            "enable": resp.data.enable,
+                            "url": handle_data.url
+                        });
+
+
+                        // 关键
+                        table.render({
+                            elem: '#condition_list'
+                            , cols: [[
+                                { field: 'order', edit: 'text', title: '排序', width: 50 }
+                                , {
+                                    field: 'type', title: '类型', width: 100, templet: function (d) {
+                                        return utils.ConditionValueType(d.type);
+                                    }
+                                }
+                                , { field: 'key', edit: 'text', width: 150, title: 'KEY', align: 'center' }
+                                , {
+                                    field: 'handle', width: 150, title: '处理', templet: function (d) {
+                                        return utils.ConditionValueHandle(d.handle);
+                                    }
+                                }
+                                , { field: 'value', edit: 'text', width: 200, title: '值' }
+                                , { title: '操作', width: 150, align: 'center', toolbar: '#table-content-list' }
+                            ]]
+                            , data: condition_data
+                        });
+                        table.render({
+                            elem: '#extractor_list'
+                            , cols: [[
+                                { field: 'order', edit: 'number', title: '排序', width: 50 }
+                                , {
+                                    field: 'type', title: '类型', width: 100, templet: function (d) {
+                                        return utils.ConditionValueType(d.type);
+                                    }
+                                }
+                                , { field: 'key', edit: 'text', width: 150, title: 'KEY', align: 'center' }
+                                , {
+                                    field: 'handle', width: 150, title: '处理', templet: function (d) {
+                                        return utils.ConditionValueHandle(d.handle);
+                                    }
+                                }
+                                , { field: 'value', edit: 'text', width: 200, title: '值' }
+                                , { field: 'default_value', edit: 'text', title: '默认值', width: 150 }
+                                , { title: '操作', width: 150, align: 'center', toolbar: '#table-content-list' }
+                            ]]
+                            , data: extractor_data
+                        });
+                    }, error: function (e) {
+                        layer.msg(e, {
+                            icon: 5,
+                            time: 2000
+                        });
+                    }
+                });
+
+            }
+            //文章管理
+
+
+            // 立即提交
+            form.on('submit(component-form-submit)', function (data) {
+                var field = data.field;
+                if (field.enable == 'on') {
+                    field.enable = 1;
+                } else {
+                    field.enable = 0;
+                }
+
+                var handle = {}
+                handle.url = field.url;
+                field.handle = JSON.stringify(handle);
+
+                var condition_list = table.cache["condition_list"];
+                var extractor_list = table.cache["extractor_list"];
+
+                field.condition_value = JSON.stringify(condition_list);
+                field.extractor = JSON.stringify(extractor_list);
+
+                if (field.condition_value == '[]') {
+                    layer.msg('匹配条件不能为空', { icon: 5, time: 2000 });
+                    return false;
+                }
+                if (field.handle == '[]') {
+                    layer.msg('结果处理不能为空', { icon: 5, time: 2000 });
+                    return false;
+                }
+
+                for (let index in condition_list) {
+                    if (JSON.stringify(condition_list[index]) == '[]') {
+                        continue;
+                    }
+                    if (Number(condition_list[index].order) <= 0) {
+                        layer.msg('【匹配条件 - 排序】不能小于0', { icon: 5, time: 2000 });
+                        return false;
+                    }
+                    switch (condition_list[index].type) {
+                        case "2":
+                            if (utils.IsEmpty(condition_list[index].key)) {
+                                layer.msg('匹配条件类型为HEADER时，KEY值不能为空', { icon: 5, time: 2000 });
+                                return false;
+                            }
+                            break;
+                        case "3":
+                            if (utils.IsEmpty(condition_list[index].key)) {
+                                layer.msg('匹配条件类型为QUERY时，KEY值不能为空', { icon: 5, time: 2000 });
+                                return false;
+                            }
+                            break;
+                    }
+                    if (utils.IsEmpty(condition_list[index].value)) {
+                        layer.msg('匹配条件的值不能为空', { icon: 5, time: 2000 });
+                        return false;
+                    }
+                }
+                for (let index in extractor_list) {
+                    if (JSON.stringify(extractor_list[index]) == '[]') {
+                        continue;
+                    }
+                    if (Number(extractor_list[index].order) <= 0) {
+                        layer.msg('变量提取的排序不能小于0', { icon: 5, time: 2000 });
+                        return false;
+                    }
+                    switch (extractor_list[index].type) {
+                        case "2":
+                            if (utils.IsEmpty(extractor_list[index].key)) {
+                                layer.msg('变量提取类型为HEADER时，KEY值不能为空', { icon: 5, time: 2000 });
+                                return false;
+                            }
+                            break;
+                        case "3":
+                            if (utils.IsEmpty(extractor_list[index].key)) {
+                                layer.msg('变量提取类型为QUERY时，KEY值不能为空', { icon: 5, time: 2000 });
+                                return false;
+                            }
+                            break;
+                    }
+                    if (utils.IsEmpty(extractor_list[index].value)) {
+                        layer.msg('变量提取的值不能为空', { icon: 5, time: 2000 });
+                        return false;
+                    }
+                }
+
+
+
+                $.ajax({
+                    type: "POST"
+                    , url: ApiUrl.BaseUrl + 'plugin/rewrite/Update'
+                    , headers: {
+                        "Authorization": layui.sessionData('DeeGateway').AccessToken
+                    }
+                    , contentType: "application/json;charset=UTF-8"
+                    , data: JSON.stringify(field)
+                    , dataType: "JSON",
+                    success: function (resp) {
+                        notice.save(resp);
+                    }, error: function (e) {
+                        layer.msg(e, {
+                            icon: 5,
+                            time: 2000
+                        });
+                    }
+                });
+
+                return false
+            });
+            form.on('submit(component-form-reset)', function (data) {
+                window.location.reload();
+            });
+            // $('.layui-btn').on('click', function () {
+            //     //  alert('gg');
+            //     var type = $(this).data('type');
+            //     active[type] ? active[type].call(this) : '';
+            // });
+
+            //监听工具条
+            table.on('tool(condition_list)', function (obj) {
+                notice.del(obj);
+            });
+
+            table.on('tool(extractor_list)', function (obj) {
+                notice.del(obj);
+            });
+
+
+            $('#add_condition').on('click', function () {
+                layer.open({
+                    type: 2
+                    , title: '新增匹配条件'
+                    , content: 'add_condition.html'
+                    , maxmin: true
+                    , area: ['550px', '500px']
+                    , btn: ['保存', '取消']
+                    , yes: function (index, layero) {
+                        var iframeWindow = window['layui-layer-iframe' + index]
+                            , submit = layero.find('iframe').contents().find("#layuiadmin-app-form-edit");
+
+                        submit.trigger('click');
+                    }
+                });
+
+            });
+            $('#add_extractor').on('click', function () {
+                layer.open({
+                    type: 2
+                    , title: '新增变量条件'
+                    , content: 'add_extractor.html'
+                    , maxmin: true
+                    , area: ['550px', '500px']
+                    , btn: ['保存', '取消']
+                    , yes: function (index, layero) {
+                        var iframeWindow = window['layui-layer-iframe' + index]
+                            , submit = layero.find('iframe').contents().find("#layuiadmin-app-form-edit");
+
+                        submit.trigger('click');
+                    }
+                });
+            });
+
+
+
+        });
+
+    </script>
+</body>
+
+</html>

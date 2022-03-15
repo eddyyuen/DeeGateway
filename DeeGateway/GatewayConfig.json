@@ -1,0 +1,46 @@
+{
+  "HttpConfig": {
+    "BufferPoolMaxMemory": 500, //最大缓存区大小，以MB为单
+    "SessionTimeOut": 3600, //会话超时，单位秒；在指定时间内没有请求则关闭连接会话
+    "UseIPv6": false, //是否则用IPV6，默认启用
+    "UrlIgnoreCase": true, //Url不区分大小写，默认不区分
+    "PacketCombined": 0, //合并消息编码，只适用于websocket,0则不开启。
+    "LogToConsole": false, //日志是否输出命令行
+    "CacheFiles": "html;htm;js;css", //缓存文件类型
+    "CacheFileSize": 500, //缓存文件大小，单位KB
+    "LogLevel": "debug", //日志级别，详细查看对应的类型
+    "WebSocketMaxRPS": 100, //会话最大RPS数，只适用于websocket
+    "BufferSize": 8096, //缓冲区大小
+    "NoGzipFiles": "jpg;jpeg;png;gif;png;ico;zip;rar;bmp", //不开启gzip支持的文件类型，其他文件则开启gzip输出
+    "MaxConnections": 10000, //最大连接数
+    "WriteLog": true, //是否写日志文件
+    "Host": "", //监听地址，不指定则是ipaddress.any
+    "Port": 9000, //监听端口
+    "MaxBodyLength": 2097152, //最大消息长度
+    "OutputStackTrace": false, //异常时是否输出详细代码信息
+    "StaticResurceType": "txt;xml;zip;jpg;css;png;htm;woff;svg;gif;woff2;js;html;jpeg;ico;rar", //支持的静态资源 
+    "DefaultPage": "product.html;index.html;index.htm" //默认页
+    //"SSL": false,
+    //"SSLPort": 443,
+    //"CertificateFile": "gateway.scigeeker.com.pfx",
+    //"CertificatePassword": "25Ditczp",
+    //"CacheLogMaxSize": 10000
+    //"Manager": "admin", //api管理界面用户
+    //"ManagerPWD": "admin123456" //api管理用户密码
+
+  },
+  "DataBase": {
+    //"DBType": "MySql",
+    "DBType": "Sqlite",
+    "ConnectionString": "Data Source=D:\\sourcecode\\dev.tencent.com\\deegateway\\DeeGateway.sqlite;",
+    //"DBType": "Sqlite",
+    //"ConnectionString": "Data Source=D:\\sourcecode\\DeeGateway\\DeeGateway.sqlite;",
+    //"ConnectionString": "server=127.0.0.1;port=3306;database=deegateway;user id=root;pwd=password;Charset=utf8mb4;", ///连接数据库
+    // "ConnectionString": "server=192.168.10.79;port=3307;database=deegateway;user id=root;pwd=An1#24;Charset=utf8mb4;", ///连接数据库
+    //"ConnectionString": "server=47.112.146.69;port=3306;database=apigateway;user id=root;pwd=An1#24;Charset=utf8mb4",
+    "Interval": 60, //定时获取数据库信息
+    "Cache": "Memory" //缓存保存方式
+  },
+  "Jwt_Token": "12qyg4coej88uqromo0xdmx4y0il5dn5y7b72tlb3imba677ht1p1xlfcnh36mk5u3xzjktfara29axvzk85apfplun7oslbe1m20c148p5d519kja5wvg7lmn5v4a5ou"
+
+}

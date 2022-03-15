@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Server</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../../__system/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../__system/layuiadmin/style/admin.css" media="all">
+</head>
+
+<body>
+
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-inline">
+                            <select name="enable">
+                                <option value="">请选择状态</option>
+                                <option value="1">启用</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-app-contlist-search">
+                            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-card-body">
+                <div style="padding-bottom: 10px;">
+                    <button class="layui-btn layuiadmin-btn-list" data-type="batchdel">删除</button>
+                    <button class="layui-btn layuiadmin-btn-list" data-type="add">添加</button>
+                </div>
+                <table id="LAY-app-content-list" lay-filter="LAY-app-content-list"></table>
+                <script type="text/html" id="buttonTpl">
+          {{#  if(d.enable ==1){ }}
+            <button class="layui-btn layui-btn-xs">已启用</button>
+          {{#  } else { }}
+            <button class="layui-btn layui-btn-danger layui-btn-xs">已禁用</button>
+          {{#  } }}
+        </script>
+                <script type="text/html" id="table-content-list">
+          <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a> 
+        </script>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../__system/layuiadmin/layui/layui.js"></script>
+    <script>
+        layui.config({
+            base: '../../../__system/layuiadmin/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use(['index', 'utils', 'table'], function () {
+            var table = layui.table
+                , form = layui.form
+                , utils = layui.utils;
+            var ApiUrl = layui.sessionData('ApiUrl');
+            var topLayui = parent === self ? layui : top.layui;
+            var ID = utils.GetQueryString("id");
+
+            //文章管理
+            table.render({
+                elem: '#LAY-app-content-list'
+                , url: ApiUrl.BaseUrl + 'gateway/ListUrlRouteServer' //模拟接口
+                , headers: {
+                    "Authorization": layui.sessionData('DeeGateway').AccessToken
+                }
+                , loading: 'true'
+                , method: 'GET'
+                , cols: [[
+                    { type: 'checkbox', fixed: 'left' }
+                    , { field: 'id', width: 100, title: 'ID', sort: true }
+                    , { field: 'url', title: 'URL', minWidth: 100 }
+                    , { field: 'server_name', title: '服务名称', minWidth: 100 }
+                    , { field: 'max_connections', title: '最大连接', minWidth: 100 }
+                    , { field: 'weight', title: 'weight' }
+                    , { field: 'maxrps', title: 'maxrps' }
+                    , { field: 'enable', title: '状态', templet: '#buttonTpl', minWidth: 80, align: 'center', sort: true }
+                    , { title: '操作', minWidth: 150, align: 'center', fixed: 'right', toolbar: '#table-content-list' }
+                ]]
+                , where: {
+                    sortField: 'id'
+                    , orderType: 'asc'
+                    , urlroute_id: ID
+                }
+                , page: true
+                , limit: 10
+                , limits: [10, 15, 20, 25, 30]
+                , text: { none: '无数据' }
+            });
+
+
+            //监听工具条
+            table.on('tool(LAY-app-content-list)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'edit') {
+                    layer.open({
+                        type: 2
+                        , title: '编辑UrlRoute'
+                        , content: 'urlroute_server_form.html?id=' + data.id
+                        , maxmin: true
+                        , area: ['550px', '500px']
+                        , btn: ['保存', '取消']
+                        , yes: function (index, layero) {
+                            var iframeWindow = window['layui-layer-iframe' + index]
+                                , submit = layero.find('iframe').contents().find("#layuiadmin-app-form-edit");
+
+                            //监听提交
+                            iframeWindow.layui.form.on('submit(layuiadmin-app-form-edit)', function (data) {
+                                var field = data.field; //获取提交的字段
+
+                                if (field.enable == 'on') {
+                                    field.enable = 1;
+                                } else {
+                                    field.enable = 0;
+                                }
+                                //提交 Ajax 成功后，静态更新表格中的数据
+                                $.ajax({
+                                    type: "POST"
+                                    , url: ApiUrl.BaseUrl + "gateway/UpdateUrlRouteServer"
+                                    ,headers: {
+                                        "Authorization": layui.sessionData('DeeGateway').AccessToken
+                                    }
+                                    , contentType: "application/json;charset=UTF-8"
+                                    , data: JSON.stringify(field)
+                                    , dataType: "JSON",
+                                    success: function (res) {
+                                        if (res.code == 0) {
+
+                                            obj.update({
+                                                id: field.id
+                                                , url: field.url
+                                                , uri: field.uri
+                                                , max_connections: field.max_connections
+                                                , weight: field.weight
+                                                , maxrps: field.maxrps
+                                                , enable: field.enable
+                                            }); //数据更新
+                                        }
+                                        else
+                                            layer.msg("编辑失败", {
+                                                icon: 5,
+                                                time: 2000
+                                            });
+                                    }
+                                    , error: function (e) {
+                                        layer.msg(e, {
+                                            icon: 5,
+                                            time: 2000
+                                        });
+                                    }
+                                });
+
+
+                                form.render();
+                                layer.close(index); //关闭弹层
+                            });
+
+                            submit.trigger('click');
+                        }
+                    });
+                }
+
+            });
+
+            //监听搜索
+            form.on('submit(LAY-app-contlist-search)', function (data) {
+                var field = data.field;
+
+                //执行重载
+                table.reload('LAY-app-content-list', {
+                    where: field
+                    , text: { none: '无数据' }
+                });
+            });
+
+            var $ = layui.$, active = {
+                batchdel: function () {
+                    var checkStatus = table.checkStatus('LAY-app-content-list')
+                        , checkData = checkStatus.data; //得到选中的数据
+
+                    if (checkData.length === 0) {
+                        return layer.msg('请选择数据');
+                    }
+
+                    layer.confirm('确定删除吗？', function (index) {
+
+                        //执行 Ajax 后重载
+                        var ids = [];
+                        for (var i = 0; i < checkData.length; i++) {
+                            ids.push(checkData[i].id);
+                        }
+
+                        $.ajax({
+                            type: "POST"
+                            , url: ApiUrl.BaseUrl + "gateway/DeleteUrlRouteServer"
+                            , headers: {
+                                "Authorization": layui.sessionData('DeeGateway').AccessToken
+                            }
+                            , contentType: "application/json;charset=UTF-8"
+                            , data: JSON.stringify(ids)
+                            , dataType: "JSON",
+                            success: function (res) {
+                                if (res.code == 0) {
+                                    table.reload('LAY-app-content-list');
+                                    layer.msg('已删除');
+                                }
+                                else
+                                    layer.msg(res.msg, {
+                                        icon: 5,
+                                        time: 2000
+                                    });
+                            }
+                            , error: function (e) {
+                                layer.msg(e, {
+                                    icon: 5,
+                                    time: 2000
+                                });
+                            }
+                        });
+
+                    });
+                },
+                add: function () {
+                    layer.open({
+                        type: 2
+                        , title: '添加URL ROUTE SERVER'
+                        , content: 'urlroute_server_form.html?urlroute_id=' + ID
+                        , maxmin: true
+                        , area: ['550px', '500px']
+                        , btn: ['新增', '取消']
+                        , yes: function (index, layero) {
+                            //点击确认触发 iframe 内容中的按钮提交
+                            var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+                            submit.click();
+                        }
+                    });
+                }
+            };
+
+            $('.layui-btn.layuiadmin-btn-list').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+        });
+    </script>
+</body>
+
+</html>

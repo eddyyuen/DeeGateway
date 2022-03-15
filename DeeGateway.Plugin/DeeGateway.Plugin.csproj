@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Authors>eddyyuen</Authors>
+    <AssemblyVersion>0.0.1.1025</AssemblyVersion>
+    <FileVersion>0.0.1.1025</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BeetleX.Bumblebee" Version="1.5.2" />
+    <PackageReference Include="BeetleX.FastHttpApi" Version="1.9.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DeeGateway.Cache\DeeGateway.Cache.csproj" />
+    <ProjectReference Include="..\DeeGateway.Repository\DeeGateway.Repository.csproj" />
+    <ProjectReference Include="..\DeeGateway.Utils\DeeGateway.Utils.csproj" />
+  </ItemGroup>
+
+</Project>

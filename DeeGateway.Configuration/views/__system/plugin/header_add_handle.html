@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../../__system/layuiadmin/layui/css/layui.css" media="all">
+</head>
+
+<body>
+
+    <div class="layui-form" lay-filter="layuiadmin-app-form-list" id="layuiadmin-app-form-list"
+        style="padding: 20px 30px 0 0;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">Key</label>
+            <div class="layui-input-inline">
+                <input type="text" name="key" id="key" lay-verify="required" placeholder="" autocomplete="off"
+                    class="layui-input" value>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">Value</label>
+            <div class="layui-input-block">
+                <input type="text" name="value" id="value" lay-verify="required" placeholder="" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">默认值</label>
+            <div class="layui-input-block">
+                <input type="text" name="default_value" id="default_value" placeholder="" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item layui-hide">
+            <input type="button" lay-submit lay-filter="layuiadmin-app-form-submit" id="layuiadmin-app-form-submit"
+                value="确认添加">
+            <input type="button" lay-submit lay-filter="layuiadmin-app-form-edit" id="layuiadmin-app-form-edit"
+                value="确认编辑">
+        </div>
+    </div>
+
+    <script src="../../../__system/layuiadmin/layui/layui.js"></script>
+    <script>
+        layui.config({
+            base: '../../../__system/layuiadmin/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use(['index', 'utils', 'form', 'admin'], function () {
+            var $ = layui.$
+                , utils = layui.utils
+                , admin = layui.admin
+                , form = layui.form;
+
+            var $ = layui.$;
+            var ApiUrl = layui.sessionData('ApiUrl');
+
+            var serverID = utils.GetQueryString("id");
+            var urlroute_id = utils.GetQueryString("urlroute_id");
+
+
+
+             //监听提交
+             form.on('submit(layuiadmin-app-form-edit)', function (data) {
+                var field = data.field; //获取提交的字段
+                var oldData = parent.layui.table.cache["handle_list"];
+                oldData.push(field);
+                parent.layui.table.reload('handle_list', {
+                    data: oldData
+                });
+
+                parent.layer.closeAll(); //关闭弹层
+            });
+        })
+    </script>
+</body>
+
+</html>

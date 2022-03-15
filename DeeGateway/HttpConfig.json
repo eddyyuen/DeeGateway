@@ -1,0 +1,6 @@
+{
+  "HttpConfig": {
+    "StaticResurceType": "txt;xml;zip;jpg;css;png;htm;woff;svg;gif;woff2;js;html;jpeg;ico;rar" //支持的静态资源 
+
+  }
+}

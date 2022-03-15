@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../../__system/layuiadmin/layui/css/layui.css" media="all">
+</head>
+
+<body>
+
+    <div class="layui-form" lay-filter="layuiadmin-app-form-list" id="layuiadmin-app-form-list"
+        style="padding: 20px 30px 0 0;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序</label>
+            <div class="layui-input-inline">
+                <input type="number" name="order" id="order" lay-verify="required" placeholder="" autocomplete="off" class="layui-input"
+                    value>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-block">
+                <select name="type" id="type" lay-verify="required" lay-filter="type">
+                    <option value=>请选择</option>
+                    <option value="1">URI</option>
+                    <option value="2">HEADER</option>
+                    <option value="3">QUERY</option>
+                    <option value="4">BODY</option>
+                    <option value="5">IP</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">KEY</label>
+            <div class="layui-input-block">
+                <input type="text" name="key" lay-verify="" placeholder="Header/QueryString 的Key" value=""
+                    autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">处理方式</label>
+            <div class="layui-input-block">
+                <select name="handle" id="handle" lay-verify="required" lay-filter="handle">
+                    <option value="">请选择</option>
+                    <option value="1">MATCH</option>
+                    <option value="2">NOT_MATCH</option>
+                    <option value="3">CONTAINS</option>
+                    <option value="4">EQUAL_TO</option>
+                    <option value="5">GREATER_THAN</option>
+                    <option value="6">LESS_THAN</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">值</label>
+            <div class="layui-input-block">
+                <input type="text" name="value" id="value" lay-verify="required" placeholder="" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item layui-hide">
+            <input type="button" lay-submit lay-filter="layuiadmin-app-form-submit" id="layuiadmin-app-form-submit"
+                value="确认添加">
+            <input type="button" lay-submit lay-filter="layuiadmin-app-form-edit" id="layuiadmin-app-form-edit"
+                value="确认编辑">
+        </div>
+    </div>
+
+    <script src="../../../__system/layuiadmin/layui/layui.js"></script>
+    <script>
+        layui.config({
+            base: '../../../__system/layuiadmin/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use(['index', 'utils', 'form', 'admin'], function () {
+            var $ = layui.$
+                , utils = layui.utils
+                , admin = layui.admin
+                , form = layui.form;
+
+            var $ = layui.$;
+            var ApiUrl = layui.sessionData('ApiUrl');
+
+            var serverID = utils.GetQueryString("id");
+            var urlroute_id = utils.GetQueryString("urlroute_id");
+
+            //监听提交
+            form.on('submit(layuiadmin-app-form-edit)', function (data) {
+                var field = data.field; //获取提交的字段
+                field.order = Number(field.order);
+                field.type = Number(field.type);
+                field.handle = Number(field.handle);
+                switch (field.type) {
+                    case 2:
+                    case 3:
+                        if (utils.IsEmpty(field.key)) {
+                            parent.layer.msg('类型为 HEADER、QUERY 时 KEY 不能为空', { icon: 5, time: 2000 });
+                            return;
+                        }
+                        break;
+                }
+                var oldData = parent.layui.table.cache["extractor_list"];
+                oldData.push(field);
+                parent.layui.table.reload('extractor_list', {
+                    data: oldData
+                });
+                parent.layer.closeAll(); //关闭弹层
+            });
+
+            function InsertSelect(select,text,value){
+                select.append(new Option(text, value));//往下拉菜单里添加元素
+            };
+            //监听类型下拉选择框
+            form.on('select(type)',function(data){
+               // var select = $('#type');
+                var handle = $('#handle');
+               // select.html("<option value=''>请选择</option>");
+                handle.html("<option value=''>请选择</option>");
+                switch (Number(data.value)) {
+                    case 1:                    
+                        InsertSelect(handle,"MATCH","1");
+                        InsertSelect(handle,"NOT_MATCH","2");
+                        InsertSelect(handle,"CONTAINS","3");
+                        InsertSelect(handle,"EQUAL_TO","4");
+                        // InsertSelect(handle,"GREATER_THAN","5");
+                        // InsertSelect(handle,"LESS_THAN","6");
+                        break;
+                    case 2:
+                        //HEADER
+                        InsertSelect(handle,"MATCH","1");
+                        InsertSelect(handle,"NOT_MATCH","2");
+                        InsertSelect(handle,"CONTAINS","3");
+                        InsertSelect(handle,"EQUAL_TO","4");
+                        InsertSelect(handle,"GREATER_THAN","5");
+                        InsertSelect(handle,"LESS_THAN","6");
+                        break;
+                    case 3:
+                        //QUERY
+                        InsertSelect(handle,"MATCH","1");
+                        InsertSelect(handle,"NOT_MATCH","2");
+                        InsertSelect(handle,"CONTAINS","3");
+                        InsertSelect(handle,"EQUAL_TO","4");
+                        InsertSelect(handle,"GREATER_THAN","5");
+                        InsertSelect(handle,"LESS_THAN","6");
+                        break;
+                    case 4: //BODY
+                        InsertSelect(handle,"MATCH","1");
+                        InsertSelect(handle,"NOT_MATCH","2");
+                        InsertSelect(handle,"CONTAINS","3");
+                        // InsertSelect(handle,"EQUAL_TO","4");
+                        // InsertSelect(handle,"GREATER_THAN","5");
+                        // InsertSelect(handle,"LESS_THAN","6");
+                        break;
+                    case 5: //IP
+                        InsertSelect(handle,"MATCH","1");
+                        InsertSelect(handle,"NOT_MATCH","2");
+                        InsertSelect(handle,"IN","7");
+                        InsertSelect(handle,"NOT_IN","8");
+                        break;
+       
+                }
+
+                form.render();
+
+            });
+          
+            
+        })
+    </script>
+</body>
+
+</html>

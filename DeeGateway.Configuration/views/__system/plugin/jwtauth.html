@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>JwtAuth</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../../__system/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../__system/layuiadmin/style/admin.css" media="all">
+    <style>
+        .layui-table-cell {
+            font-size: 14px;
+            padding: 0 5px;
+            height: auto;
+            overflow: visible;
+            text-overflow: inherit;
+            white-space: normal;
+            word-break: break-all;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">路由</label>
+                        <div class="layui-input-inline">
+                            <select name="urlroute_id" id="urlroute_id" lay-verify="">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-inline">
+                            <select name="enable">
+                                <option value="">请选择状态</option>
+                                <option value="1">启用</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-app-contlist-search">
+                            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-card-body">
+                <div style="padding-bottom: 10px;">
+                        <button class="layui-btn layuiadmin-btn-list" data-type="sync">同步到网关缓存</button>
+                    <button class="layui-btn layuiadmin-btn-list" data-type="batchdel">删除</button>
+                    <button class="layui-btn layuiadmin-btn-list" data-type="add">添加</button>
+                </div>
+                <table id="LAY-app-content-list" lay-filter="LAY-app-content-list"></table>
+                <script type="text/html" id="buttonTpl">
+                    {{#  if(d.enable ==1){ }}
+                    <button class="layui-btn layui-btn-xs">已启用</button>
+                    {{#  } else { }}
+                    <button class="layui-btn layui-btn-danger layui-btn-xs">已禁用</button>
+                    {{#  } }}
+                </script>
+
+                <script type="text/html" id="table-content-list">
+          <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>   </script>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../__system/layuiadmin/layui/layui.js"></script>
+    <script>
+        layui.config({
+            base: '../../../__system/layuiadmin/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use(['index', 'utils', 'html', 'table'], function () {
+            var $ = layui.$
+                , table = layui.table
+                , utils = layui.utils
+                , html = layui.html
+                , form = layui.form;
+            var ApiUrl = layui.sessionData('ApiUrl');
+            var topLayui = parent === self ? layui : top.layui;
+
+
+            $.ajax({
+                type: "GET"
+                , url: ApiUrl.BaseUrl + 'gateway/ListAllUrlRoute?sortField=urlroute_name&orderType=asc'
+                , headers: {
+                    "Authorization": layui.sessionData('DeeGateway').AccessToken
+                }
+                , contentType: "application/json;charset=UTF-8",
+                success: function (resp) {
+
+                    $.each(resp.data, function (index, item) {
+                        $('#urlroute_id').append(new Option(item.urlroute_name, item.id));//往下拉菜单里添加元素
+                    });
+                    form.render();
+                }
+            });
+            //文章管理
+            table.render({
+                elem: '#LAY-app-content-list'
+                , url: ApiUrl.BaseUrl + 'plugin/jwtauth/ListServer' //模拟接口
+                , headers: {
+                    "Authorization": layui.sessionData('DeeGateway').AccessToken
+                }
+                , loading: 'true'
+                , method: 'GET'
+                , cols: [[
+                    { type: 'checkbox' }
+                    , { field: 'title', title: '用途', width: 150 }
+                    , { field: 'urlroute_name', title: '路由', width: 150 }
+                    , {
+                        width: 60, title: '匹配', align: 'center', templet: function (d) {
+                            return utils.ConditionType(d.condition_type);
+                        }
+                    }
+                    , {
+                        minWidth: 200, title: '条件', templet: function (d) {
+                            var htmltext = '';
+                            layui.each(d.condition_value, function (index, item) {
+                                htmltext += html.IndexHtml(index + 1) + " ";
+                                htmltext += html.ConditionValueHtml(item);
+                            });
+                            return htmltext;
+                        }
+                    }
+                    , {
+                        minWidth: 200, title: '白名单', templet: function (d) {
+                            var htmltext = '';
+                            layui.each(d.extractor, function (index, item) {
+                                htmltext += html.IndexExtractorHtml(index) + ' ';
+                                htmltext += html.ExtractorHtml(item);
+                            });
+                            return htmltext;
+                        }
+                    }
+                    , {
+                        field: 'handle', title: '处理', minWidth: 200, templet: function (d) {
+                            return html.JwtAuthHandleHtml(d.handle);
+                        }
+                    }
+                    , { field: 'enable', width: 80, title: '状态', templet: '#buttonTpl', align: 'center', sort: true }
+                    , { title: '操作', width: 80, align: 'center', toolbar: '#table-content-list' }
+                ]]
+                , where: {
+                    sortField: 'id'
+                    , orderType: 'asc'
+                    , enable: '-1'
+                }
+                , page: true
+                , limit: 5
+                , limits: [5, 10, 15, 20, 25, 30]
+                , text: { none: '无数据' }
+            });
+
+            //监听工具条
+            table.on('tool(LAY-app-content-list)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'edit') {
+                    //编辑urlroute关联的服务器
+                    topLayui.index.openTabsPage("plugin/jwtauth_form.html?id=" + data.id, "JwtAuth:" + data.urlroute_name);
+                }
+            });
+
+            //监听搜索
+            form.on('submit(LAY-app-contlist-search)', function (data) {
+                var field = data.field;
+
+                if (field.enable == '') {
+                    field.enable = -1;
+                }
+                //执行重载
+                table.reload('LAY-app-content-list', {
+                    where: field
+                    , text: { none: '无数据' }
+                });
+            });
+
+            var $ = layui.$, active = {
+                batchdel: function () {
+                    var checkStatus = table.checkStatus('LAY-app-content-list')
+                        , checkData = checkStatus.data; //得到选中的数据
+
+                    if (checkData.length === 0) {
+                        return layer.msg('请选择数据');
+                    }
+
+                    layer.confirm('确定删除吗？', function (index) {
+
+                        //执行 Ajax 后重载
+                        var ids = [];
+                        for (var i = 0; i < checkData.length; i++) {
+                            ids.push(checkData[i].id);
+                        }
+
+                        $.ajax({
+                            type: "POST"
+                            , url: ApiUrl.BaseUrl + "plugin/jwtauth/DeleteJwtAuth"
+                            , headers: {
+                                "Authorization": layui.sessionData('DeeGateway').AccessToken
+                            }
+                            , contentType: "application/json;charset=UTF-8"
+                            , data: JSON.stringify(ids)
+                            , dataType: "JSON",
+                            success: function (res) {
+                                if (res.code == 0) {
+                                    table.reload('LAY-app-content-list');
+                                    layer.msg('已删除', {
+                                        icon: 6,
+                                        time: 2000,
+                                        shade: 0.5
+                                    });
+
+                                }
+                                else
+                                    layer.msg('删除失败', {
+                                        icon: 5,
+                                        time: 2000,
+                                        shade: 0.5
+                                    });
+                            }
+                            , error: function (e) {
+                                layer.msg(e, {
+                                    icon: 5,
+                                    time: 2000
+                                });
+                            }
+                        });
+
+                    });
+                },
+                add: function () {
+                    topLayui.index.openTabsPage("plugin/jwtauth_add.html", "新增JwtAtuh");
+                },
+                sync:function () {
+                    layer.confirm('确定同步缓存吗？', function (index) {
+                    $.ajax({
+                        type: "POST"
+                        , url: ApiUrl.BaseUrl + "plugin/jwtauth/SyncCache?name=Requesting_JwtAuth"
+                        , headers: {
+                                        "Authorization": layui.sessionData('DeeGateway').AccessToken
+                                    }
+                        , contentType: "application/json;charset=UTF-8"
+                        , dataType: "JSON",
+                        success: function (res) {
+                            if (res.code == 0) {
+                            table.reload('LAY-app-content-list');
+                            layer.msg('同步成功');
+                            }
+                            else
+                            layer.msg(res.msg, {
+                                icon: 5,
+                                time: 2000
+                            });
+                        }
+                        , error: function (e) {
+                            layer.msg(e, {
+                            icon: 5,
+                            time: 2000
+                            });
+                        }
+                        });
+
+                        });
+                    }
+            };
+
+            $('.layui-btn.layuiadmin-btn-list').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+        });
+    </script>
+</body>
+
+</html>

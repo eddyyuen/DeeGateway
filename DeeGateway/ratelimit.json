@@ -1,0 +1,100 @@
+{
+  "WriteRequestedLog": false,
+  "WriteRequestBlockedLog": true,
+  "IpRateLimiting": {
+    "EnableEndpointRateLimiting": true,
+    "StackBlockedRequests": false,
+    "RealIpHeader": "X-Real-IP",
+    "ClientIdHeader": "X-ClientId",
+    "HttpStatusCode": 429,
+    "IpWhitelist": [ "::1/10", "192.168.0.0/24" ],
+    "EndpointWhitelist": [ "*:/__system/*", "*:/__manage/*"],
+    "ClientWhitelist": [],
+    "QuotaExceededResponse": {
+      "Content": "{{ \"message\": \"Whoa! Calm down, cowboy!\", \"details\": \"Quota exceeded. Maximum allowed: {0} per {1}. Please try again in {2} second(s).\" }}",
+      "ContentType": "application/json"
+    },
+    "GeneralRules": [
+      {
+        "Endpoint": "*",
+        "Period": "1s",
+        "Limit": 10
+      },
+      {
+        "Endpoint": "*",
+        "Period": "1m",
+        "Limit": 300
+      },
+      {
+        "Endpoint": "*:/mobase/baike/*",
+        "Period": "1d",
+        "Limit": 1000
+      }
+    ]
+  },
+
+  "IpRateLimitPolicies": {
+    "IpRules": [
+      {
+        "Ip": "39.108.12.118",
+        "Rules": [
+          {
+            "Endpoint": "*",
+            "Period": "1s",
+            "Limit": 100
+          }
+        ]
+      }
+    ]
+  },
+
+  "ClientRateLimiting": {
+    "EnableEndpointRateLimiting": true,
+    "ClientIdHeader": "X-ClientId",
+    "HttpStatusCode": 429,
+    "EndpointWhitelist": [ "*:/__system/*", "*:/__manage/*"],
+    "ClientWhitelist": [ "cl-key-a"],
+    "GeneralRules": [
+      {
+        "Endpoint": "*",
+        "Period": "1s",
+        "Limit": 10
+      },
+      {
+        "Endpoint": "*",
+        "Period": "1m",
+        "Limit": 300
+      }
+    ]
+  },
+
+  "ClientRateLimitPolicies": {
+    "ClientRules": [
+      {
+        "ClientId": "cl-key-1",
+        "Rules": [
+          {
+            "Endpoint": "*",
+            "Period": "1s",
+            "Limit": 10
+          },
+          {
+            "Endpoint": "get:/api/clients",
+            "Period": "1m",
+            "Limit": 2
+          }
+        ]
+      },
+      {
+        "ClientId": "cl-key-3",
+        "Rules": [
+          {
+            "Endpoint": "post:/api/clients",
+            "Period": "1s",
+            "Limit": 3
+          }
+        ]
+      }
+    ]
+  }
+}
